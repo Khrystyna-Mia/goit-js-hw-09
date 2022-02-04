@@ -6,22 +6,91 @@ const inputEl = document.getElementById('datetime-picker');
 const startBtn = document.querySelector('[data-start]');
 const stopBtn = document.querySelector('[data-stop]');
 const dataDays = document.querySelector('[data-days]');
-const dataH = document.querySelector('[data-hours]');
-const dataM = document.querySelector('[data-minutes]');
-const dataS = document.querySelector('[data-seconds]');
+const dataHours = document.querySelector('[data-hours]');
+const dataMinutes = document.querySelector('[data-minutes]');
+const dataSeconds = document.querySelector('[data-seconds]');
 
-// startBtn.disabled = true;
-let timerId = null;
+startBtn.disabled = true;
+// stopBtn.disabled = true;
+
+let userDate = null;
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
+
   onClose(selectedDates) {
-    console.log(selectedDates[0]);
+    if (selectedDates[0] < options.defaultDate) {
+      return Notify.failure("Please choose a date in the future");
+  }
+    Notify.success('Data is valid!');
+    startBtn.disabled = false;
+
+    userDate = selectedDates[0];
   },
-};
+}
+
+class Timer {
+  constructor() {
+    this.intervalId = null;
+    // this.isActive = false;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+  }
+  
+  start() {
+    // if (this.isActive) {
+    //   return;
+    // }
+    const startTime = Data.now();
+    // this.isActive = true;
+
+    this.intervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const deltaTime = selectedDates - currentTime;
+      const { days, hours, minutes, seconds } = convertMs(deltaTime);
+
+      dataDays.innerHTML = days;
+      dataHours.innerHTML = hours;
+      dataMinutes.innerHTML = minutes;
+      dataSeconds.innerHTML = seconds;
+      
+      if (deltaTime < 0) {
+        clearInterval(this.intervalId);
+        startBtn.disabled = true;
+        return;
+      }
+
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    }, 1000)
+  }
+
+   stop() {
+      clearInterval(this.intervalId);
+      // this.isActive = false;
+
+      startBtn.disabled = true;
+      stopBtn.disabled = true;
+    }
+}
+
+const timer = new Timer();
+flatpickr(inputEl, options);
+
+startBtn.addEventListener('click', () => {
+    timer.start();
+});
+
+stopBtn.addEventListener('click', () => {
+  timer.stop();
+});
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
@@ -31,13 +100,13 @@ function convertMs(ms) {
   const day = hour * 24;
 
   // Remaining days
-  const days = Math.floor(ms / day);
+  const days = addLeadingZero(Math.floor(ms / day));
   // Remaining hours
-  const hours = Math.floor((ms % day) / hour);
+  const hours = addLeadingZero(Math.floor((ms % day) / hour));
   // Remaining minutes
-  const minutes = Math.floor(((ms % day) % hour) / minute);
+  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
   // Remaining seconds
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  const seconds = addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
 
   return { days, hours, minutes, seconds };
 }
