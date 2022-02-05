@@ -2,7 +2,6 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const inputEl = document.getElementById('datetime-picker');
 const startBtn = document.querySelector('[data-start]');
 const stopBtn = document.querySelector('[data-stop]');
 const dataDays = document.querySelector('[data-days]');
@@ -10,10 +9,15 @@ const dataHours = document.querySelector('[data-hours]');
 const dataMinutes = document.querySelector('[data-minutes]');
 const dataSeconds = document.querySelector('[data-seconds]');
 
-startBtn.disabled = true;
-// stopBtn.disabled = true;
+let selectedDate = null;
+let intervalId = null;
 
-let userDate = null;
+startBtn.disabled = true;
+
+startBtn.addEventListener('click', start);
+stopBtn.addEventListener('click', stop);
+
+/* Вторым аргументом функции flatpickr(selector, options) передаем необязательный объект параметров. */
 
 const options = {
   enableTime: true,
@@ -21,76 +25,75 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
 
+  /* В методе onClose() обрабатываем дату выбранную пользователем: 
+  если пользователь не выбрал дату в будущем - failure, если верная дата - success*/
+
   onClose(selectedDates) {
-    if (selectedDates[0] < options.defaultDate) {
-      return Notify.failure("Please choose a date in the future");
-  }
-    Notify.success('Data is valid!');
-    startBtn.disabled = false;
+    if (selectedDates[0].getTime() < Date.now()) {
+      return Notify.failure('Please choose a date in the future');
 
-    userDate = selectedDates[0];
-  },
-}
+    } else {
+      Notify.success('The selected date is valid!');
 
-class Timer {
-  constructor() {
-    this.intervalId = null;
-    // this.isActive = false;
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-  }
-  
-  start() {
-    // if (this.isActive) {
-    //   return;
-    // }
-    const startTime = Data.now();
-    // this.isActive = true;
-
-    this.intervalId = setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = selectedDates - currentTime;
-      const { days, hours, minutes, seconds } = convertMs(deltaTime);
-
-      dataDays.innerHTML = days;
-      dataHours.innerHTML = hours;
-      dataMinutes.innerHTML = minutes;
-      dataSeconds.innerHTML = seconds;
-      
-      if (deltaTime < 0) {
-        clearInterval(this.intervalId);
-        startBtn.disabled = true;
-        return;
-      }
-
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-    }, 1000)
-  }
-
-   stop() {
-      clearInterval(this.intervalId);
-      // this.isActive = false;
-
-      startBtn.disabled = true;
-      stopBtn.disabled = true;
+      startBtn.disabled = false;
+      selectedDate = selectedDates[0].getTime();
     }
+  },
+};
+
+const calendar = flatpickr('#datetime-picker', options);
+
+/* Запускаем/останавливаем таймер */
+
+function start() {
+  const startTime = selectedDate;
+
+  intervalId = setInterval(() => {
+    const currentTime = Date.now();
+    const deltaTime = startTime - currentTime;
+
+    const { days, hours, minutes, seconds } = convertMs(deltaTime);
+
+    if (deltaTime < 0) {
+      clearInterval(intervalId);
+    }
+
+    startBtn.disabled = true;
+
+    updateTimer({ days, hours, minutes, seconds });
+  }, 1000);
 }
 
-const timer = new Timer();
-flatpickr(inputEl, options);
+/* Останавливаем/очищаем таймер */
 
-startBtn.addEventListener('click', () => {
-    timer.start();
-});
+function stop() {
+  startBtn.disabled = true;
 
-stopBtn.addEventListener('click', () => {
-  timer.stop();
-});
+  const time = convertMs(0);
+  updateTimer(time);
+
+  clearInterval(intervalId);
+
+  calendar.setDate(Date.now());
+}
+
+/* Выбираем время */
+
+function updateTimer({ days, hours, minutes, seconds }) {
+    dataDays.textContent = `${ days }`;
+    dataHours.textContent = `${ hours }`;
+    dataMinutes.textContent = `${ minutes }`;
+    dataSeconds.textContent = `${ seconds }`;
+}
+
+/* Перед отрисовкой интефрейса форматируем значение. */
 
 function addLeadingZero(value) {
   return String(value).padStart(2, '0');
 }
+
+/* Для подсчета значений используем функцию convertMs, где ms - разница между конечной и текущей датой в миллисекундах. */
+/* Функция convertMs() возвращает объект с рассчитанным оставшимся временем до конечной даты. */
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
@@ -110,3 +113,37 @@ function convertMs(ms) {
 
   return { days, hours, minutes, seconds };
 }
+
+
+
+// startBtn.addEventListener('click', () => {
+//    const startTime = selectedDate;
+
+//    intervalId = setInterval(() => {
+//    const currentTime = Date.now();
+//    const deltaTime = startTime - currentTime;
+
+//    const { days, hours, minutes, seconds } = convertMs(deltaTime);
+
+//    if (deltaTime < 0) {
+//       clearInterval(intervalId);
+//    }
+
+//    startBtn.disabled = true;
+
+//    updateTimer({ days, hours, minutes, seconds });
+
+//   }, 1000);
+// });
+
+// stopBtn.addEventListener('click', () => {
+//    clearInterval(intervalId);
+
+//    const time = convertMs(0);
+//    startBtn.disabled = true;
+
+//    updateTimer(time);
+//    calendar.setDate(Date.now());
+// });
+
+ 
