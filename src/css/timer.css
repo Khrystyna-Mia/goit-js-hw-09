@@ -34,7 +34,6 @@ button {
 }
 
 .timer {
-  /* color: #fff; */
   text-align: center;
   font-size: 30px;
 
@@ -44,6 +43,7 @@ button {
 }
 
 .field {
+  width: 100px;
   padding: 10px;
   border-radius: 4px;
   background: #00bf96;
