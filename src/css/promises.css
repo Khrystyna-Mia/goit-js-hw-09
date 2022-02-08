@@ -1,0 +1,13 @@
+.form input {
+  display: flex;
+  width: 150px;
+  margin-right: 10px;
+}
+
+.form label {
+  font-weight: bold;
+  font-size: 15px;
+
+  display: inline-block;
+  margin-right: 10px;
+}
