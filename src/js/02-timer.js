@@ -69,12 +69,18 @@ function start() {
 function stop() {
   startBtn.disabled = true;
 
-  const time = convertMs(0);
-  updateTimer(time);
-
   clearInterval(intervalId);
 
   calendar.setDate(Date.now());
+
+  dataDays.textContent = '00';
+  dataHours.textContent = '00';
+  dataMinutes.textContent = '00';
+  dataSeconds.textContent = '00';
+
+  // const time = convertMs(0);
+  // updateTimer(time);
+
 }
 
 /* Выбираем время */
@@ -116,34 +122,3 @@ function convertMs(ms) {
 
 
 
-// startBtn.addEventListener('click', () => {
-//    const startTime = selectedDate;
-
-//    intervalId = setInterval(() => {
-//    const currentTime = Date.now();
-//    const deltaTime = startTime - currentTime;
-
-//    const { days, hours, minutes, seconds } = convertMs(deltaTime);
-
-//    if (deltaTime < 0) {
-//       clearInterval(intervalId);
-//    }
-
-//    startBtn.disabled = true;
-
-//    updateTimer({ days, hours, minutes, seconds });
-
-//   }, 1000);
-// });
-
-// stopBtn.addEventListener('click', () => {
-//    clearInterval(intervalId);
-
-//    const time = convertMs(0);
-//    startBtn.disabled = true;
-
-//    updateTimer(time);
-//    calendar.setDate(Date.now());
-// });
-
- 
