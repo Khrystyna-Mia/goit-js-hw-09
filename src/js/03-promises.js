@@ -51,11 +51,6 @@ function createPromise(position, delay) {
 //         // if (position < 1) {
 //         //     delay += step;
 //         // }
-        
-
-//         createPromise({ position, delay })
-//             .then(({ position, delay }) => Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`))
-//             .catch(({position, delay}) => Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`));
          
 //         // createPromise(position, delay)
 //         //     .then(({ position, delay }) => {
