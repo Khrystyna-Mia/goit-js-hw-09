@@ -54,9 +54,9 @@ function start() {
 
     const { days, hours, minutes, seconds } = convertMs(deltaTime);
 
-    if (deltaTime < 0) {
-      clearInterval(intervalId);
-    }
+    // if (deltaTime > 0) {
+    //   clearInterval(intervalId);
+    // }
 
     startBtn.disabled = true;
 
@@ -73,8 +73,8 @@ function stop() {
 
   clearInterval(intervalId);
 
-  const time = convertMs(0);
-  updateTimer(time);
+   const time = convertMs(0);
+   updateTimer(time);
 
 }
 
